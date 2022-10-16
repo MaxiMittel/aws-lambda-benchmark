@@ -1,0 +1,125 @@
+service: aws-lambda-benchmark
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: eu-central-1
+  environment:
+    S3_BUCKET: ${self:service}-bucket-fmasz8
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+          Resource:
+            - 'arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*'
+
+functions:
+  test:
+    handler: handler.tester
+    events:
+      - httpApi:
+          path: /test
+          method: get
+  info128:
+    handler: handler.info
+    memorySize: 128
+    events:
+      - httpApi:
+          path: /info128
+          method: get
+  info512:
+    handler: handler.info
+    memorySize: 512
+    events:
+      - httpApi:
+          path: /info512
+          method: get
+  info1024:
+    handler: handler.info
+    memorySize: 1024
+    events:
+      - httpApi:
+          path: /info1024
+          method: get
+  info1536:
+    handler: handler.info
+    memorySize: 1536
+    events:
+      - httpApi:
+          path: /info1536
+          method: get
+  info2048:
+    handler: handler.info
+    memorySize: 2048
+    events:
+      - httpApi:
+          path: /info2048
+          method: get
+  info3072:
+    handler: handler.info
+    memorySize: 3072
+    events:
+      - httpApi:
+          path: /info3072
+          method: get
+  info4096:
+    handler: handler.info
+    memorySize: 4096
+    events:
+      - httpApi:
+          path: /info4096
+          method: get
+  info5120:
+    handler: handler.info
+    memorySize: 5120
+    events:
+      - httpApi:
+          path: /info5120
+          method: get
+  info6144:
+    handler: handler.info
+    memorySize: 6144
+    events:
+      - httpApi:
+          path: /info6144
+          method: get
+  info7168:
+    handler: handler.info
+    memorySize: 7168
+    events:
+      - httpApi:
+          path: /info7168
+          method: get
+  info8192:
+    handler: handler.info
+    memorySize: 8192
+    events:
+      - httpApi:
+          path: /info8192
+          method: get
+  info9216:
+    handler: handler.info
+    memorySize: 9216
+    events:
+      - httpApi:
+          path: /info9216
+          method: get
+  info10240:
+    handler: handler.info
+    memorySize: 10240
+    events:
+      - httpApi:
+          path: /info10240
+          method: get
+
+
+resources:
+  Resources:
+    S3TranscriptionBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${self:provider.environment.S3_BUCKET}

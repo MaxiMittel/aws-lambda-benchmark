@@ -1,0 +1,59 @@
+{
+  "cpu": {
+    "manufacturer": "Intel",
+    "brand": "Xeon® Processor",
+    "vendor": "",
+    "family": "",
+    "model": "",
+    "stepping": "",
+    "revision": "",
+    "voltage": "",
+    "speed": 2.5,
+    "speedMin": null,
+    "speedMax": null,
+    "governor": "",
+    "cores": 3,
+    "physicalCores": 3,
+    "performanceCores": 3,
+    "efficiencyCores": 0,
+    "processors": 1,
+    "socket": "",
+    "flags": "",
+    "virtualization": false,
+    "cache": {
+      "l1d": "",
+      "l1i": "",
+      "l2": "",
+      "l3": ""
+    }
+  },
+  "os": {
+    "platform": "linux",
+    "distro": "Amazon Linux",
+    "release": "2",
+    "codename": "",
+    "kernel": "4.14.255-276-224.499.amzn2.x86_64",
+    "arch": "x64",
+    "hostname": "169.254.36.145",
+    "codepage": "UTF-8",
+    "logofile": "amazon-linux",
+    "serial": "",
+    "build": "",
+    "servicepack": "",
+    "uefi": false
+  },
+  "ram": {
+    "total": 5789106176,
+    "free": 5613473792,
+    "used": 175632384,
+    "active": 258469888,
+    "available": 5530636288,
+    "buffers": 6246400,
+    "cached": 81534976,
+    "slab": 16375808,
+    "buffcache": 104157184,
+    "swaptotal": 0,
+    "swapused": 0,
+    "swapfree": 0
+  }
+}
