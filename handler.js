@@ -17,14 +17,12 @@ async function measureUpload(key, content) {
   };
 
   const start = new Date().getTime();
-
-  await s3.upload(params).promise();
-
+  await Promise.all(Array(10).fill(0).map(async () => await s3.upload(params).promise()));
   const end = new Date().getTime();
   const time = end - start;
-  const size = content.ContentLength;
 
-  const bandwidth = (size * 8 / 1000000) / (time / 1000);
+  const size = content.ContentLength;
+  const bandwidth = ((size * 10) * 8 / 1000000) / (time / 1000);
 
   return { time, bandwidth };
 }
@@ -41,37 +39,32 @@ async function measureDownload(key) {
   };
 
   const start = new Date().getTime();
-
-  const content = await s3.getObject(params).promise();
-
+  await Promise.all(Array(10).fill(0).map(async () => await s3.getObject(params).promise()));
   const end = new Date().getTime();
   const time = end - start;
+
+  const content = await s3.getObject(params).promise();
   const size = content.ContentLength;
 
-  const bandwidth = (size * 8 / 1000000) / (time / 1000);
+  const bandwidth = ((size * 10) * 8 / 1000000) / (time / 1000);
 
   return { time, bandwidth, content };
 }
 
 module.exports.tester = async (event) => {
   const download10 = await measureDownload("10mb.txt");
-  const download100 = await measureDownload("100mb.txt");
 
   const now = Date.now();
   const upload10 = await measureUpload(`${now}/10mb.txt`, download10.content);
-  const upload100 = await measureUpload(`${now}/100mb.txt`, download100.content);
 
   delete download10.content;
-  delete download100.content;
 
   return {
     statusCode: 200,
     body: JSON.stringify(
       {
         download10,
-        download100,
         upload10,
-        upload100,
       },
       null,
       2

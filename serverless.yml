@@ -18,11 +18,21 @@ provider:
             - 'arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*'
 
 functions:
-  test:
+  test512:
     handler: handler.tester
+    memorySize: 512
+    timeout: 60
     events:
       - httpApi:
-          path: /test
+          path: /test512
+          method: get
+  test2048:
+    handler: handler.tester
+    memorySize: 2048
+    timeout: 60
+    events:
+      - httpApi:
+          path: /test2048
           method: get
   info128:
     handler: handler.info
