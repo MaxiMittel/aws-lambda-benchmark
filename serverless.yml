@@ -18,21 +18,109 @@ provider:
             - 'arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*'
 
 functions:
+  test128:
+    handler: handler.tester
+    memorySize: 128
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test128
+          method: get
   test512:
     handler: handler.tester
     memorySize: 512
-    timeout: 60
+    timeout: 30
     events:
       - httpApi:
           path: /test512
           method: get
+  test1024:
+    handler: handler.tester
+    memorySize: 1024
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test1024
+          method: get
+  test1536:
+    handler: handler.tester
+    memorySize: 1536
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test1536
+          method: get
   test2048:
     handler: handler.tester
     memorySize: 2048
-    timeout: 60
+    timeout: 30
     events:
       - httpApi:
           path: /test2048
+          method: get
+  test3072:
+    handler: handler.tester
+    memorySize: 3072
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test3072
+          method: get
+  test4096:
+    handler: handler.tester
+    memorySize: 4096
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test4096
+          method: get
+  test5120:
+    handler: handler.tester
+    memorySize: 5120
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test5120
+          method: get
+  test6144:
+    handler: handler.tester
+    memorySize: 6144
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test6144
+          method: get
+  test7168:
+    handler: handler.tester
+    memorySize: 7168
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test7168
+          method: get
+  test8192:
+    handler: handler.tester
+    memorySize: 8192
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test8192
+          method: get
+  test9216:
+    handler: handler.tester
+    memorySize: 9216
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test9216
+          method: get
+  test10240:
+    handler: handler.tester
+    memorySize: 10240
+    timeout: 30
+    events:
+      - httpApi:
+          path: /test10240
           method: get
   info128:
     handler: handler.info

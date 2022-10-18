@@ -52,19 +52,19 @@ async function measureDownload(key) {
 }
 
 module.exports.tester = async (event) => {
-  const download10 = await measureDownload("10mb.txt");
+  const download = await measureDownload("10mb.txt");
 
   const now = Date.now();
-  const upload10 = await measureUpload(`${now}/10mb.txt`, download10.content);
+  const upload = await measureUpload(`${now}/10mb.txt`, download.content);
 
-  delete download10.content;
+  delete download.content;
 
   return {
     statusCode: 200,
     body: JSON.stringify(
       {
-        download10,
-        upload10,
+        download,
+        upload,
       },
       null,
       2
