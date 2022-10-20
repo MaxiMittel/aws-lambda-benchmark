@@ -27,7 +27,43 @@ To start I created a table with the available memory sizes and the corresponding
 
 **Note**: Sometimes the CPU speed was 3.0Ghz instead of 2.5Ghz. But this was not consistent, so I decided to use 2.5Ghz as the CPU speed.
 
-### Deployment
+## How to test the bandwith?
+
+To test the bandwith, I created the `generator.py` script that generates a random file with a given size, the script can be found in the `scripts` folder. The file is then uploaded to an S3 bucket. The lambda function with different sizes will download this file **10 times** in parallel, measure the time it takes to download the file and calculate the bandwith. After the file is downloaded the same file is uploaded **10 times** in parallel to the S3 bucket, here the time is taken as well and the bandwith is calculated. The results are then returned to the user.
+
+To get better average readings I created a script (`graph.py`) that runs all the tests ten times, calculates the average bandwith, fluctuation of the test invokations and creates graphs for the results. The script can be found in the `scripts` folder.
+
+## Bandwith compared to memory size
+![bandwith_memory](images/bandwidth.png)
+
+The graph shows the upload and download bandwith in relation to the memory size. We can see that the bandwidth increases almost linear until we reach the `4096MB` threshold. After that the bandwith flattens out.
+
+## Bandwith at different times
+
+I ran my tests at different times of the day to see if there is a difference in the bandwith. The idea behind this test was, that the usage of the AWS Lambda instances might be different at different times of the day. So it might be possible, that we reach higher numbers at night, when less people are using the same AWS Lambda instances.
+
+![bandwith_memory](images/bandwidth.png)
+
+## Fluctuation of the tests
+
+In this last test I wanted to see how much the bandwith fluctuates between the different invokations of the lambda function. 
+
+![fluctuation_2048](images/fluctuation_2048.png)
+
+We can see quiet a big fluctuation in the bandwith. Sometimes it drops to almost half of the average bandwith. This is probably due to the fact, that the AWS Lambda instances are shared between different users. So if another user is using the same instance, the bandwith might drop.
+You can see all the fluctuation graphs in the `graphs` folder. They all show a similiar pattern.
+
+## Token based bandwith
+
+As meantioned in the Paper ""
+
+## Prices compared to EC2 instances
+
+TODO
+
+## Deployment
+
+To deploy the functions run the command below. This script will create a new Lambda function for each memory size and upload the corresponding code.
 
 ```
 $ serverless deploy

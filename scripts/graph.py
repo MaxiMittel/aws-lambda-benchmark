@@ -1,5 +1,3 @@
-# Call api 10 times generate graph of results
-
 import requests
 import json
 import matplotlib.pyplot as plt
@@ -21,24 +19,26 @@ def test_api(memory):
     return results
 
 # Generate graph for bandwidth fluctuation
-def generate_graph_fluctuation(memory, results):
+def generate_graph_fluctuation(memory, data):
     # Create lists for upload and download bandwidth
     upload_bandwidth = []
     download_bandwidth = []
-    for result in results:
+    for result in data:
         upload_bandwidth.append(result["upload"]["bandwidth"])
         download_bandwidth.append(result["download"]["bandwidth"])
 
-    call = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    call = [1,2,3,4,5,6,7,8,9,10]
 
-    plt.plot(call, upload_bandwidth, color='blue')
-    plt.plot(call, download_bandwidth, color='red')
-    plt.xlabel("Memory")
-    plt.ylabel("Bandwidth")
-    plt.title("Upload and download bandwidth")
+    plt.plot(call, upload_bandwidth, color='#D11149', label='Upload')
+    plt.plot(call, download_bandwidth, color='#1A8FE3', label='Download')
+    plt.xlabel("Invocations")
+    plt.ylabel("Bandwidth [Mbps]")
+    plt.title("Bandwidth fluctuation: " + str(memory) + " MB")
+    plt.legend(["Upload", "Download"])
 
     # Save to file
     plt.savefig("../graphs/fluctuation_" + str(memory) + ".png")
+    plt.close()
 
 
 def avg_bandwidth(results):
@@ -69,21 +69,21 @@ def generate_graph_bandwidth(api_results):
     width = 0.2 # width of bar
     x = np.arange(length)
 
-    ax.bar(x, data[:,0], width, color='#000080', label='Upload')
-    ax.bar(x + width, data[:,1], width, color='#0F52BA', label='Download')
+    ax.bar(x, data[:,0], width, color='#D11149', label='Upload')
+    ax.bar(x + width, data[:,1], width, color='#1A8FE3', label='Download')
 
     ax.set_ylabel('Bandwidth [Mbps]')
     ax.set_xticks(x + width + width/2)
     ax.set_xticklabels(x_labels)
     ax.set_xlabel('Memory [MB]')
-    ax.set_title('Bandwidth')
+    ax.set_title('Bandwidth of AWS Lambda function with different memory sizes')
     ax.legend()
-    #plt.grid(True, 'major', 'y', ls='--', lw=.5, c='k', alpha=.3)
 
     fig.tight_layout()
 
     # Save to file
     plt.savefig("../graphs/bandwidth.png")
+    plt.close()
 
 def main():
     results = {}
