@@ -40,7 +40,7 @@ The graph shows the upload and download bandwith in relation to the memory size.
 
 ## Bandwith at different times
 
-I ran my tests at different times of the day to see if there is a difference in the bandwith. The idea behind this test was, that the usage of the AWS Lambda instances might be different at different times of the day. So it might be possible, that we reach higher numbers at night, when less people are using the same AWS Lambda instances.
+I ran my tests at different times of the day to see if there is a difference in the bandwith. The idea behind this test was, that the usage of the AWS Lambda instances might be different at different times of the day. So it might be possible, that we reach higher numbers at night, when less people are using the same AWS Lambda instances. This seems to be right to some extend, but the difference is not that big.
 
 ![bandwith_memory](images/bandwidth_1000.png)
 ![bandwith_memory](images/bandwidth_1500.png)
@@ -55,9 +55,15 @@ In this last test I wanted to see how much the bandwith fluctuates between the d
 We can see quiet a big fluctuation in the bandwith. Sometimes it drops to almost half of the average bandwith. This is probably due to the fact, that the AWS Lambda instances are shared between different users. So if another user is using the same instance, the bandwith might drop.
 You can see all the fluctuation graphs in the `graphs` folder. They all show a similiar pattern.
 
-## Token based bandwith
+## Bandwith over time
 
-As meantioned in the Paper ""
+As meantioned in the Paper "Lambada: Interactive Data Analytics on Cold Data Using Serverless Cloud Infrastructure", they figured that AWS Lambda uses some sort of token based Bandwidth throttling. This means that the bandwith is limited to a certain amount of tokens. If the tokens are used up, the bandwith is throttled. This helps when short bursts of bandwith are needed, but not when a constant bandwith is needed.
+
+![spike_6144](images/spike_6144.png)
+![spike_10240](images/spike_10240.png)
+
+To measure this behaviour I increased my test size from 10 files to 100 files, that are first downloaded, then uploaded in parallel, althought they are uploaded in parallel you can clearly see that downloads/uploads that are started later get throttled. This is probably due to the fact that the tokens are used up by the first downloads/uploads. What is interesting is that the upload speed seems to stay the same for all invokations, while the download speed drops.
+You can see all the fluctuation spike in the `graphs` folder. They all show a similiar pattern.
 
 ## Prices compared to EC2 instances
 

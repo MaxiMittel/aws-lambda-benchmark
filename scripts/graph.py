@@ -3,7 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
-memory_settings = [512, 1024, 1536, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240]
+memory_settings = [512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240]
 
 # Define function to call api
 def call_api(memory):
@@ -24,10 +24,10 @@ def generate_graph_fluctuation(memory, data):
     upload_bandwidth = []
     download_bandwidth = []
     for result in data:
-        upload_bandwidth.append(result["upload"]["bandwidth"])
-        download_bandwidth.append(result["download"]["bandwidth"])
+        upload_bandwidth.append(result["upload"]["total"]["bandwidth"])
+        download_bandwidth.append(result["download"]["total"]["bandwidth"])
 
-    call = [1,2,3,4,5,6,7,8,9,10]
+    call = list(range(1,11))
 
     plt.plot(call, upload_bandwidth, color='#D11149', label='Upload')
     plt.plot(call, download_bandwidth, color='#1A8FE3', label='Download')
@@ -40,13 +40,31 @@ def generate_graph_fluctuation(memory, data):
     plt.savefig("../graphs/fluctuation_" + str(memory) + ".png")
     plt.close()
 
+# Generate graph for bandwidth fluctuation
+def generate_graph_spikes(memory, data):
+    upload_bandwidth = data["upload"]["bandwidth"]
+    download_bandwidth = data["download"]["bandwidth"]
+
+    call = list(range(1,101))
+
+    plt.plot(call, upload_bandwidth, color='#D11149', label='Upload')
+    plt.plot(call, download_bandwidth, color='#1A8FE3', label='Download')
+    plt.xlabel("Invocations")
+    plt.ylabel("Bandwidth [Mbps]")
+    plt.title("Bandwidth spikes: " + str(memory) + " MB")
+    plt.legend(["Upload", "Download"])
+
+    # Save to file
+    plt.savefig("../graphs/spike_" + str(memory) + ".png")
+    plt.close()
+
 
 def avg_bandwidth(results):
     upload_bandwidth = []
     download_bandwidth = []
     for result in results:
-        upload_bandwidth.append(result["upload"]["bandwidth"])
-        download_bandwidth.append(result["download"]["bandwidth"])
+        upload_bandwidth.append(result["upload"]["total"]["bandwidth"])
+        download_bandwidth.append(result["download"]["total"]["bandwidth"])
     return sum(upload_bandwidth)/len(upload_bandwidth), sum(download_bandwidth)/len(download_bandwidth)
 
 # Generate upload and download bandwidth bar chart
@@ -91,6 +109,8 @@ def main():
         print("Testing for memory: " + str(memory))
         results[memory] = test_api(memory)
         generate_graph_fluctuation(memory, results[memory])
+        if memory >= 2048:
+            generate_graph_spikes(memory, results[memory][0])
 
     print("Generating bandwidth graph")
     generate_graph_bandwidth(results)

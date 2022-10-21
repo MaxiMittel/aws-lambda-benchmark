@@ -3,6 +3,7 @@ const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
 const si = require("systeminformation");
 const Bucket = "aws-lambda-benchmark-bucket-fmasz8";
+const TEST_SIZE = 100;
 
 /**
  * Measures the upload bandwidth of a file of the given size in MB.
@@ -16,15 +17,26 @@ async function measureUpload(key, content) {
     Body: content.Body,
   };
 
-  const start = new Date().getTime();
-  await Promise.all(Array(10).fill(0).map(async () => await s3.upload(params).promise()));
-  const end = new Date().getTime();
-  const time = end - start;
+  const totalStart = new Date().getTime();
+  const times = await Promise.all(Array(TEST_SIZE).fill(0).map(async () => {
+    const start = new Date().getTime();
+    await s3.upload(params).promise();
+    const end = new Date().getTime();
+    return end - start;
+  }));
+  const totalEnd = new Date().getTime();
+  const totalTime = totalEnd - totalStart;
 
   const size = content.ContentLength;
-  const bandwidth = ((size * 10) * 8 / 1000000) / (time / 1000);
 
-  return { time, bandwidth };
+  return {
+    total: {
+      time: totalTime,
+      bandwidth: ((size * TEST_SIZE) * 8 / 1000000) / (totalTime / 1000),
+    },
+    times,
+    bandwidth: times.map(t => (size * 8 / 1000000) / (t / 1000)),
+  };
 }
 
 /**
@@ -38,17 +50,28 @@ async function measureDownload(key) {
     Key: key,
   };
 
-  const start = new Date().getTime();
-  await Promise.all(Array(10).fill(0).map(async () => await s3.getObject(params).promise()));
-  const end = new Date().getTime();
-  const time = end - start;
+  const totalStart = new Date().getTime();
+  const times = await Promise.all(Array(TEST_SIZE).fill(0).map(async () => {
+    const start = new Date().getTime();
+    await s3.getObject(params).promise();
+    const end = new Date().getTime();
+    return end - start;
+  }));
+  const totalEnd = new Date().getTime();
+  const totalTime = totalEnd - totalStart;
 
   const content = await s3.getObject(params).promise();
   const size = content.ContentLength;
 
-  const bandwidth = ((size * 10) * 8 / 1000000) / (time / 1000);
-
-  return { time, bandwidth, content };
+  return {
+    total: {
+      time: totalTime,
+      bandwidth: ((size * TEST_SIZE) * 8 / 1000000) / (totalTime / 1000),
+    },
+    times,
+    bandwidth: times.map(t => (size * 8 / 1000000) / (t / 1000)),
+    content,
+  };
 }
 
 module.exports.tester = async (event) => {
