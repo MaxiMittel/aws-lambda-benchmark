@@ -76,7 +76,7 @@ def generate_graph_bandwidth(api_results):
     ax.set_xticks(x + width + width/2)
     ax.set_xticklabels(x_labels)
     ax.set_xlabel('Memory [MB]')
-    ax.set_title('Bandwidth of AWS Lambda function with different memory sizes')
+    ax.set_title('Bandwidth at 10:00')
     ax.legend()
 
     fig.tight_layout()

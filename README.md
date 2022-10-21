@@ -42,7 +42,9 @@ The graph shows the upload and download bandwith in relation to the memory size.
 
 I ran my tests at different times of the day to see if there is a difference in the bandwith. The idea behind this test was, that the usage of the AWS Lambda instances might be different at different times of the day. So it might be possible, that we reach higher numbers at night, when less people are using the same AWS Lambda instances.
 
-![bandwith_memory](images/bandwidth.png)
+![bandwith_memory](images/bandwidth_1000.png)
+![bandwith_memory](images/bandwidth_1500.png)
+![bandwith_memory](images/bandwidth_2300.png)
 
 ## Fluctuation of the tests
 
