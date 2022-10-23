@@ -1,13 +1,10 @@
 # AWS Lambda bandwith benchmark
-
-This is a simple benchmark to test the bandwith of AWS Lambda.
-
 ## How do AWS Lambda instances scale?
 
 When configuring a Lambda function, you can set the memory size and the timeout. The memory size is the amount of RAM available to the function. 
-The timeout is the maximum amount of time the function can run.
-The memory size does not only increase the amount of RAM available to the function, but also the CPU power.
-To start I created a table with the available memory sizes and the corresponding CPU power. All prices are for the region `eu-central-1` and are in `USD`.
+The timeout is the maximum amount of time the function can be executed.
+The memory size not only increases the amount of RAM available to the function, but also the CPU power.
+For starters, I have created a table with the available memory sizes and the corresponding CPU power. All prices are for the region `eu-central-1` and are in `USD`.
 
 | Memory  | Cores | Speed  | Price per 1ms    |
 |---------|-------|--------|------------------|
@@ -25,22 +22,22 @@ To start I created a table with the available memory sizes and the corresponding
 | 9216MB  | 6     | 2,5Ghz | 0,0000001500 USD |
 | 10240MB | 6     | 2,5Ghz | 0,0000001667 USD |
 
-**Note**: Sometimes the CPU speed was 3.0Ghz instead of 2.5Ghz. But this was not consistent, so I decided to use 2.5Ghz as the CPU speed.
+**Note**: Sometimes the CPU speed was 3.0Ghz instead of 2.5Ghz. But this was rarely the case, so I decided to use 2.5Ghz as the CPU speed for all.
 
 ## How to test the bandwith?
 
-To test the bandwith, I created the `generator.py` script that generates a random file with a given size, the script can be found in the `scripts` folder. The file is then uploaded to an S3 bucket. The lambda function with different sizes will download this file **10 times** in parallel, measure the time it takes to download the file and calculate the bandwith. After the file is downloaded the same file is uploaded **10 times** in parallel to the S3 bucket, here the time is taken as well and the bandwith is calculated. The results are then returned to the user.
+To test the bandwidth, I created the script `generator.py` which generates a random file of a certain size; the script is located in the folder `scripts`. The file is then uploaded to an S3 bucket. The Lambda function with different sizes downloads this file **10 times** in parallel, measures the time it takes to download the file and calculates the bandwidth. After the file is downloaded, the same file is uploaded **10 times** in parallel to the S3 bucket, again measuring the time and calculating the bandwidth. The results are then returned to the user.
 
-To get better average readings I created a script (`graph.py`) that runs all the tests ten times, calculates the average bandwith, fluctuation of the test invokations and creates graphs for the results. The script can be found in the `scripts` folder.
+To get better averages, I created a script (`graph.py`) that runs all the tests ten times, calculates the average bandwidth and the fluctuation of the test calls and creates graphs for the results. The script can be found in the `scripts` folder.
 
 ## Bandwith compared to memory size
 ![bandwith_memory](images/bandwidth.png)
 
-The graph shows the upload and download bandwith in relation to the memory size. We can see that the bandwidth increases almost linear until we reach the `4096MB` threshold. After that the bandwith flattens out.
+The diagram shows the upload and download bandwidth as a function of the memory size. It can be seen that the bandwidth increases significantly with increasing storage size until it flattens out at around `1400 Mbps` and a storage size of `2048 MB`. Upload bandwidth also increases with increasing storage size, but peaks earlier at around `800 Mbps`. Note that these speeds are peaks, but more on that later.
 
 ## Bandwith at different times
 
-I ran my tests at different times of the day to see if there is a difference in the bandwith. The idea behind this test was, that the usage of the AWS Lambda instances might be different at different times of the day. So it might be possible, that we reach higher numbers at night, when less people are using the same AWS Lambda instances. This seems to be right to some extend, but the difference is not that big.
+I ran my tests at different times of the day to see if there was a difference in bandwidth. The idea behind this test was that the usage of AWS Lambda instances could be different at different times of the day. So it could be that we get higher numbers at night when fewer people are using the same AWS Lambda instances. This does not seem to be the case, as we actually achieved higher peak bandwidth at 15:00 than at 23:00. On the whole, however, the results remained about the same.
 
 ![bandwith_memory](images/bandwidth_1000.png)
 ![bandwith_memory](images/bandwidth_1500.png)
@@ -48,30 +45,26 @@ I ran my tests at different times of the day to see if there is a difference in 
 
 ## Fluctuation of the tests
 
-In this last test I wanted to see how much the bandwith fluctuates between the different invokations of the lambda function. 
+In this last test, I wanted to see how much the bandwidth varies between the different invocations of the lambda function. 
 
 ![fluctuation_2048](images/fluctuation_2048.png)
 
-We can see quiet a big fluctuation in the bandwith. Sometimes it drops to almost half of the average bandwith. This is probably due to the fact, that the AWS Lambda instances are shared between different users. So if another user is using the same instance, the bandwith might drop.
-You can see all the fluctuation graphs in the `graphs` folder. They all show a similiar pattern.
+A strong fluctuation can be observed in the bandwidth. Sometimes it drops to almost half the average bandwidth. This is probably due to the fact that the AWS Lambda instances are shared by different users. So if another user is using the same instance, the bandwidth may drop.
+You can see all the fluctuation graphs in the `graphs` folder. They all show a similar pattern.
 
 ## Bandwith over time
 
-As meantioned in the Paper "Lambada: Interactive Data Analytics on Cold Data Using Serverless Cloud Infrastructure", they figured that AWS Lambda uses some sort of token based Bandwidth throttling. This means that the bandwith is limited to a certain amount of tokens. If the tokens are used up, the bandwith is throttled. This helps when short bursts of bandwith are needed, but not when a constant bandwith is needed.
+As noted in the paper ["Lambada: Interactive Data Analytics on Cold Data Using Serverless Cloud Infrastructure"](https://dl.acm.org/doi/10.1145/3318464.3389758), it has been suggested that AWS Lambda uses a form of token-based bandwidth throttling. This means that tokens are accumulated during times when bandwidth is not being used and then used during times when bandwidth is being used. This helps to better handle peaks in bandwidth usage.
 
 ![spike_6144](images/spike_6144.png)
 ![spike_10240](images/spike_10240.png)
 
-To measure this behaviour I increased my test size from 10 files to 100 files, that are first downloaded, then uploaded in parallel, althought they are uploaded in parallel you can clearly see that downloads/uploads that are started later get throttled. This is probably due to the fact that the tokens are used up by the first downloads/uploads. What is interesting is that the upload speed seems to stay the same for all invokations, while the download speed drops.
-You can see all the fluctuation spike in the `graphs` folder. They all show a similiar pattern.
-
-## Prices compared to EC2 instances
-
-TODO
+To measure this behaviour, I increased my test size from 10 to 100 files, which are downloaded first and then uploaded in parallel. Although they are uploaded in parallel, you can clearly see that downloads/uploads started later are throttled. This is probably because the tokens are used up by the first downloads/uploads. It is interesting that the upload speed seems to stay the same for all calls, while the download speed decreases.
+You can see all the fluctuation peaks in the `graphs` folder. They all show a similar pattern.
 
 ## Deployment
 
-To deploy the functions run the command below. This script will create a new Lambda function for each memory size and upload the corresponding code.
+To deploy the functions, execute the following command. This script creates a new lambda function for each memory size and uploads the corresponding code.
 
 ```
 $ serverless deploy
